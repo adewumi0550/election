@@ -1,6 +1,5 @@
 
 'use server';
-import 'dotenv/config';
 
 import type { Admin, Ballot, Candidate, Election, Office, Vote, Voter, ElectionResult } from './types';
 import { revalidatePath } from 'next/cache';
