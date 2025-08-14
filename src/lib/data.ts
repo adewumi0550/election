@@ -40,17 +40,23 @@ export async function getOfficesClient(): Promise<Office[]> {
 // ADMIN API
 export async function createAdminUser(name: string, email: string, pass: string): Promise<{ success: boolean; message: string; }> {
     try {
-        await serverAuth.createUser({
+        const userRecord = await serverAuth.createUser({
             email,
             password: pass,
             displayName: name,
         });
-        
-        // IMPORTANT: Removed Firestore document creation here.
-        // An existing admin must now manually create a document in the 'admins' collection
-        // with the new user's UID to grant them access.
 
-        return { success: true, message: 'Account created. Please ask an existing administrator to grant you permissions.' };
+        const adminsCollection = collection(adminDb, 'admins');
+        await setDoc(doc(adminsCollection, userRecord.uid), {
+            uid: userRecord.uid,
+            name: name,
+            email: email,
+            status: true,
+            verified: true,
+            restricted: false,
+        });
+
+        return { success: true, message: 'Account created successfully! You can now log in.' };
 
     } catch (error: any) {
         let message = 'An unexpected error occurred.';

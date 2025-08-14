@@ -24,10 +24,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const adminUser = await getAdminUser(user.uid);
-        if (adminUser && !adminUser.restricted) {
+        if (adminUser && adminUser.status && !adminUser.restricted) {
           setUser(user);
         } else {
-          setUser(null);
+          // This case handles if an admin is manually disabled in Firestore.
+          setUser(null); 
           await firebaseSignOut(auth);
         }
       } else {
@@ -44,12 +45,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const adminUser = await getAdminUser(userCredential.user.uid);
       
       if (!adminUser) {
+        // This case should ideally not happen with the new registration flow, but is a good safeguard.
         await firebaseSignOut(auth);
-        return { success: false, message: 'Admin account not found or not yet approved.' };
+        return { success: false, message: 'Admin account not found. Please register first.' };
       }
       if (adminUser.restricted || !adminUser.status) {
         await firebaseSignOut(auth);
-        return { success: false, message: 'Your account is not approved or is restricted.' };
+        return { success: false, message: 'Your account has been disabled by an administrator.' };
       }
       
       return { success: true };
@@ -58,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         let message = 'An unexpected error occurred.';
         if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             message = 'Invalid email or password.';
-        } else {
+        } else if (error.message) {
             message = error.message;
         }
         return { success: false, message };

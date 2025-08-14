@@ -39,7 +39,7 @@ export default function RegisterPage() {
       const result = await createAdminUser(name, email, password);
 
       if (result.success) {
-        toast({ title: 'Registration Submitted', description: result.message });
+        toast({ title: 'Registration Successful', description: result.message });
         setIsSuccess(true);
       } else {
         toast({
@@ -66,12 +66,12 @@ export default function RegisterPage() {
             <>
                 <CardHeader className="text-center">
                     <UserPlus className="mx-auto h-12 w-12 text-primary" />
-                    <CardTitle className="mt-4">Registration Submitted</CardTitle>
-                    <CardDescription>Your account has been created. Please contact an existing administrator to grant you access to the admin panel.</CardDescription>
+                    <CardTitle className="mt-4">Registration Successful!</CardTitle>
+                    <CardDescription>Your account has been created. You can now log in to the admin panel.</CardDescription>
                 </CardHeader>
                 <CardFooter>
                     <Button asChild className="w-full">
-                        <Link href="/admin-login">Back to Sign In</Link>
+                        <Link href="/admin-login">Proceed to Sign In</Link>
                     </Button>
                 </CardFooter>
             </>
@@ -80,7 +80,7 @@ export default function RegisterPage() {
             <CardHeader className="text-center">
                 <UserPlus className="mx-auto h-12 w-12 text-primary" />
                 <CardTitle className="mt-4">Create Admin Account</CardTitle>
-                <CardDescription>Fill in the details to request an admin account. Access requires approval from an existing admin.</CardDescription>
+                <CardDescription>Fill in the details to create an administrator account.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -120,7 +120,7 @@ export default function RegisterPage() {
             <CardFooter className="flex flex-col gap-4">
                 <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Request Account
+                    Create Account
                 </Button>
                  <Button asChild variant="link" className="w-full">
                     <Link href="/admin-login">
