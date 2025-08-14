@@ -1,5 +1,6 @@
+
 import ManifestoForm from './manifesto-form';
-import { getOffices } from '@/lib/queries';
+import { getOffices } from '@/lib/actions';
 
 export default async function ManifestoWriterPage() {
     const offices = await getOffices();

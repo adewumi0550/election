@@ -1,4 +1,5 @@
-import { getElection, getElections, getElectionResults } from '@/lib/queries';
+
+import { getElection, getElections, getElectionResults } from '@/lib/actions';
 import ResultsChart from '@/components/results-chart';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Suspense } from 'react';

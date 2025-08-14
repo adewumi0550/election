@@ -1,45 +1,19 @@
 
-import { collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
-import { db as adminDb } from './firebase-admin';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db as clientDb } from './firebase';
-import type { Candidate, Election, Office, Vote, Ballot, ElectionResult, Voter } from './types';
+import type { Candidate, Election, Office } from './types';
 
-// SERVER-SIDE QUERIES (using adminDb)
+// CLIENT-SIDE QUERIES (using clientDb for public read access)
 
-export async function getElections(): Promise<Election[]> {
-  const electionsCollection = collection(adminDb, 'elections');
+export async function getElectionsClient(): Promise<Election[]> {
+  const electionsCollection = collection(clientDb, 'elections');
   const snapshot = await getDocs(electionsCollection);
-  const elections = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return { 
-          id: doc.id, 
-          ...data,
-          // Convert Firestore Timestamps to serializable Date objects
-          startTime: data.startTime.toDate(), 
-          endTime: data.endTime.toDate() 
-      } as Election;
-  });
-  return elections.sort((a,b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+  const elections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), startTime: doc.data().startTime.toDate(), endTime: doc.data().endTime.toDate() } as Election));
+  return elections.sort((a,b) => b.startTime.getTime() - a.startTime.getTime());
 }
 
-export async function getElection(id: string): Promise<Election | undefined> {
-  const docRef = doc(adminDb, 'elections', id);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    return { 
-        id: docSnap.id, 
-        ...data,
-        startTime: data.startTime.toDate(),
-        endTime: data.endTime.toDate()
-    } as Election;
-  }
-  return undefined;
-}
-
-
-export async function getOffices(): Promise<Office[]> {
-  const fixedOffices: Office[] = [
+export async function getOfficesClient(): Promise<Office[]> {
+    const fixedOffices: Office[] = [
     { id: 'pres', name: 'President', order: 1 },
     { id: 'vp', name: 'Vice President', order: 2 },
     { id: 'sec-gen', name: 'Secretary General', order: 3 },
@@ -60,81 +34,12 @@ export async function getOffices(): Promise<Office[]> {
   return Promise.resolve(fixedOffices.sort((a, b) => a.order - b.order));
 }
 
-export async function getCandidates(electionId?: string): Promise<Candidate[]> {
-    const candidatesCollection = collection(adminDb, 'candidates');
+export async function getCandidatesClient(electionId?: string): Promise<Candidate[]> {
+    const candidatesCollection = collection(clientDb, 'candidates');
     let q = query(candidatesCollection);
     if (electionId) {
         q = query(candidatesCollection, where('electionId', '==', electionId));
     }
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Candidate));
-}
-
-export async function getCandidate(id: string): Promise<Candidate | undefined> {
-  const docRef = doc(adminDb, 'candidates', id);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return { id: docSnap.id, ...docSnap.data() } as Candidate;
-  }
-  return undefined;
-}
-
-export async function getVoters(electionId: string): Promise<Voter[]> {
-    const votersCollection = collection(adminDb, 'voters');
-    const q = query(votersCollection, where('electionId', '==', electionId));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Voter));
-}
-
-
-export async function getElectionResults(electionId: string): Promise<ElectionResult[]> {
-    const votesCollection = collection(adminDb, 'votes');
-    const offices = await getOffices();
-    const candidates = await getCandidates(electionId);
-    const votesQuery = query(votesCollection, where('electionId', '==', electionId));
-    const votesSnapshot = await getDocs(votesQuery);
-    const votes = votesSnapshot.docs.map(doc => doc.data() as Vote);
-
-    const results: ElectionResult[] = [];
-
-    for (const office of offices) {
-        const officeResult: ElectionResult = {
-            officeId: office.id,
-            officeName: office.name,
-            results: [],
-        };
-
-        const candidatesForOffice = candidates.filter(c => c.officeId === office.id);
-
-        for (const candidate of candidatesForOffice) {
-            const voteCount = votes.filter(v => v.ballot[office.id] === candidate.id).length;
-            officeResult.results.push({
-                candidateId: candidate.id,
-                candidateName: candidate.fullName,
-                votes: voteCount,
-            });
-        }
-        
-        officeResult.results.sort((a, b) => b.votes - a.votes);
-        results.push(officeResult);
-    }
-    
-    results.sort((a,b) => offices.find(o => o.id === a.officeId)!.order - offices.find(o => o.id === b.officeId)!.order);
-
-    return Promise.resolve(results);
-}
-
-
-// CLIENT-SIDE QUERIES (using clientDb for public read access)
-
-export async function getElectionsClient(): Promise<Election[]> {
-  const electionsCollection = collection(clientDb, 'elections');
-  const snapshot = await getDocs(electionsCollection);
-  const elections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), startTime: doc.data().startTime.toDate(), endTime: doc.data().endTime.toDate() } as Election));
-  return elections.sort((a,b) => b.startTime.getTime() - a.startTime.getTime());
-}
-
-export async function getOfficesClient(): Promise<Office[]> {
-  // Offices are fixed, so we can return them directly without a client-side DB call.
-  return getOffices();
 }

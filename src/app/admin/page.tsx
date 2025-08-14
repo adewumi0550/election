@@ -1,4 +1,5 @@
-import { getCandidates, getElections, getElectionResults } from '@/lib/queries';
+
+import { getCandidates, getElections, getElectionResults } from '@/lib/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Vote, Clock } from 'lucide-react';
 import Link from 'next/link';

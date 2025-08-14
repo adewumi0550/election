@@ -1,4 +1,5 @@
-import { getElections, getOffices } from '@/lib/queries';
+
+import { getElections, getOffices } from '@/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Suspense } from 'react';
 import CandidateList from './candidate-list';

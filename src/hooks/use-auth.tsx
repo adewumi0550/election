@@ -12,12 +12,11 @@ import {
   User, 
   signOut as firebaseSignOut,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
-  updateProfile,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, collection } from "firebase/firestore"; 
+import { doc, getDoc } from "firebase/firestore"; 
 import { auth, db } from '@/lib/firebase';
+import { signUpAndCreateAdmin } from '@/lib/actions';
 import type { Admin } from '@/lib/types';
 
 interface AuthContextType {
@@ -56,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
            setAdmin(adminData);
         } else {
            setAdmin(null);
+           // Optional: You might want to sign out the user if they are not a verified admin
+           // firebaseSignOut(auth);
         }
       } else {
         setUser(null);
@@ -78,29 +79,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, pass: string, name: string) => {
     try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        await updateProfile(userCredential.user, { displayName: name });
-        
-        const newAdmin: Admin = {
-            uid: userCredential.user.uid,
-            name: name,
-            email: email,
-            status: true,
-            verified: true, // Auto-verified on creation for simplicity
-            restricted: false,
-        };
-
-        await setDoc(doc(db, 'admins', userCredential.user.uid), newAdmin);
-        
+        const result = await signUpAndCreateAdmin({ email, password: pass, name });
+        if (!result.success) {
+            return { success: false, message: result.error || 'An unknown error occurred.' };
+        }
         return { success: true, message: 'Account created successfully! You can now log in.' };
     } catch (error: any) {
-        let message = 'An unexpected error occurred.';
-        if (error.code === 'auth/email-already-in-use') {
-            message = 'This email is already registered.';
-        } else if (error.message) {
-            message = error.message;
-        }
-        return { success: false, message };
+        return { success: false, message: error.message || 'An unexpected error occurred.' };
     }
   };
 
