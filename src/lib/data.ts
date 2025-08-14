@@ -39,34 +39,26 @@ export async function getOfficesClient(): Promise<Office[]> {
 
 // ADMIN API
 export async function createAdminUser(name: string, email: string, pass: string): Promise<{ success: boolean; message: string; }> {
-    try {
-        const userRecord = await serverAuth.createUser({
-            email,
-            password: pass,
-            displayName: name,
-        });
-        
-        const adminsCollection = collection(adminDb, 'admins');
+    const userRecord = await serverAuth.createUser({
+        email,
+        password: pass,
+        displayName: name,
+    });
+    
+    const adminsCollection = collection(adminDb, 'admins');
 
-        const adminData: Admin = {
-            uid: userRecord.uid,
-            name,
-            email,
-            status: false,
-            verified: false,
-            restricted: true,
-        };
+    const adminData: Admin = {
+        uid: userRecord.uid,
+        name,
+        email,
+        status: false,
+        verified: false,
+        restricted: true,
+    };
 
-        await setDoc(doc(adminsCollection, userRecord.uid), adminData);
+    await setDoc(doc(adminsCollection, userRecord.uid), adminData);
 
-        return { success: true, message: 'Account created. Please wait for admin approval.' };
-    } catch (error: any) {
-        if (error.code === 'auth/email-already-exists') {
-            return { success: false, message: 'An account with this email already exists.' };
-        }
-        console.error("Error creating admin user:", error);
-        return { success: false, message: error.message || 'Failed to create admin user.' };
-    }
+    return { success: true, message: 'Account created. Please wait for admin approval.' };
 }
 
 export async function getAdminUser(uid: string): Promise<Admin | null> {
