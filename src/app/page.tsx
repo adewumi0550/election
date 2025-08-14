@@ -6,8 +6,25 @@ import { Clock } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function HomePage() {
-  const elections = await getElections();
-  const offices = await getOffices();
+  let elections;
+  let offices;
+  
+  try {
+    elections = await getElections();
+    offices = await getOffices();
+  } catch (error) {
+    console.error("Failed to fetch initial election data:", error);
+    return (
+       <div className="container mx-auto p-4 md:p-8">
+        <Card className="text-center p-12">
+            <CardTitle className="text-2xl text-destructive">Error Loading Election Data</CardTitle>
+            <CardContent className="mt-4">
+                <p className="text-muted-foreground">There was a problem fetching data from the database. This might be due to Firestore security rules. Please ensure that the 'elections' and 'offices' collections are publicly readable.</p>
+            </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   // Find the currently active election
   const now = new Date();
