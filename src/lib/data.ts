@@ -39,13 +39,14 @@ export async function getOfficesClient(): Promise<Office[]> {
 
 // ADMIN API
 export async function createAdminUser(name: string, email: string, pass: string) {
-    const adminsCollection = collection(adminDb, 'admins');
     try {
         const userRecord = await serverAuth.createUser({
             email,
             password: pass,
             displayName: name,
         });
+        
+        const adminsCollection = collection(adminDb, 'admins');
 
         const adminData: Admin = {
             uid: userRecord.uid,
@@ -63,6 +64,7 @@ export async function createAdminUser(name: string, email: string, pass: string)
         if (error.code === 'auth/email-already-exists') {
             return { success: false, message: 'An account with this email already exists.' };
         }
+        console.error("Error creating admin user:", error);
         return { success: false, message: error.message || 'Failed to create admin user.' };
     }
 }
