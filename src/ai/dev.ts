@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/manifesto-writer.ts';
+// AI Flows are disabled as Firebase/GoogleAI is not configured.
+// import '@/ai/flows/manifesto-writer.ts';

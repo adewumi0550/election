@@ -2,9 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { LayoutDashboard, FileText, Settings, Users, Vote, LogOut } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
 
 import {
   SidebarProvider,
@@ -19,13 +18,9 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/app-logo';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const router = useRouter();
-    const { user, loading, signOut } = useAuth();
 
     const menuItems = [
       { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -34,34 +29,6 @@ export default function AdminLayoutContent({ children }: { children: React.React
       { href: '/admin/manifesto-writer', label: 'Manifesto Writer', icon: FileText },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
     ];
-
-    React.useEffect(() => {
-        if (!loading && !user) {
-            router.push('/admin/login');
-        }
-    }, [user, loading, router]);
-
-
-    if (loading || !user) {
-      const isAuthPage = pathname === '/admin/login' || pathname === '/admin/register' || pathname === '/admin/forgot-password';
-      if (isAuthPage) {
-        return <>{children}</>
-      }
-      return (
-         <div className="flex items-center justify-center h-screen">
-          <div className="flex flex-col items-center gap-4">
-              <AppLogo />
-              <Skeleton className="h-8 w-48" />
-              <p className="text-muted-foreground">Loading & Verifying User...</p>
-          </div>
-        </div>
-      );
-    }
-
-    const handleSignOut = async () => {
-        await signOut();
-        router.push('/admin/login');
-    }
   
     return (
       <SidebarProvider>
@@ -89,7 +56,7 @@ export default function AdminLayoutContent({ children }: { children: React.React
           <SidebarFooter>
              <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out">
+                    <SidebarMenuButton tooltip="Sign Out">
                         <LogOut />
                         <span>Sign Out</span>
                     </SidebarMenuButton>

@@ -36,7 +36,7 @@ export default function HomePage() {
 
       } catch (err: any) {
         console.error("Failed to fetch initial election data:", err);
-        setError("There was a problem fetching data from the database. This might be due to Firestore security rules. Please ensure that the 'elections' and 'offices' collections are publicly readable.");
+        setError("There was a problem fetching data. The application is not connected to a database. Please configure Firebase.");
       } finally {
         setLoading(false);
       }

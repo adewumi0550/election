@@ -1,15 +1,11 @@
 
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db as clientDb } from './firebase';
 import type { Candidate, Election, Office } from './types';
 
-// CLIENT-SIDE QUERIES (using clientDb for public read access)
+// CLIENT-SIDE QUERIES (STUBBED)
 
 export async function getElectionsClient(): Promise<Election[]> {
-  const electionsCollection = collection(clientDb, 'elections');
-  const snapshot = await getDocs(electionsCollection);
-  const elections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), startTime: doc.data().startTime.toDate(), endTime: doc.data().endTime.toDate() } as Election));
-  return elections.sort((a,b) => b.startTime.getTime() - a.startTime.getTime());
+  console.log("getElectionsClient called. Firebase is not configured. Returning empty array.");
+  return [];
 }
 
 export async function getOfficesClient(): Promise<Office[]> {
@@ -35,11 +31,6 @@ export async function getOfficesClient(): Promise<Office[]> {
 }
 
 export async function getCandidatesClient(electionId?: string): Promise<Candidate[]> {
-    const candidatesCollection = collection(clientDb, 'candidates');
-    let q = query(candidatesCollection);
-    if (electionId) {
-        q = query(candidatesCollection, where('electionId', '==', electionId));
-    }
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Candidate));
+    console.log("getCandidatesClient called. Firebase is not configured. Returning empty array.");
+    return [];
 }

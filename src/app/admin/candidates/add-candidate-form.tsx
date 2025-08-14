@@ -73,21 +73,22 @@ export default function AddCandidateForm({ offices, elections, selectedElectionI
 
   const handleAddCandidate = async (data: CandidateFormValues) => {
     try {
-      const photoBase64 = await toBase64(data.photo[0]);
+      // Photo upload is disabled as Firebase Storage is not configured.
+      // const photoBase64 = await toBase64(data.photo[0]);
       await addCandidate({
         fullName: data.fullName,
         officeId: data.officeId,
         manifesto: data.manifesto,
         electionId: data.electionId,
-        photoUrl: photoBase64,
+        photoUrl: "https://placehold.co/100x100.png", // Using a placeholder
         'data-ai-hint': 'person portrait',
       });
-      toast({ title: 'Success', description: 'Candidate added successfully.' });
+      toast({ title: 'Success', description: 'Candidate added successfully (using placeholder image).' });
       router.refresh();
       // A full page reload might be better here to ensure all state is reset.
       window.location.href = `/admin/candidates?electionId=${data.electionId}`;
     } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to add candidate.' });
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to add candidate. Firebase might not be configured.' });
     }
   };
   
