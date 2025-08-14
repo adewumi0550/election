@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, setHours, setMinutes } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Election } from '@/lib/types';
 
@@ -20,15 +21,23 @@ interface ElectionFormProps {
 
 export default function ElectionForm({ action, election }: ElectionFormProps) {
   const [title, setTitle] = useState(election?.title || '');
+  const [description, setDescription] = useState(election?.description || '');
   const [startTime, setStartTime] = useState<Date | undefined>(election ? new Date(election.startTime) : undefined);
   const [endTime, setEndTime] = useState<Date | undefined>(election ? new Date(election.endTime) : undefined);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
+  const handleTimeChange = (date: Date | undefined, setDate: (date: Date | undefined) => void, time: string) => {
+    if (!date) return;
+    const [hours, minutes] = time.split(':').map(Number);
+    const newDate = setMinutes(setHours(date, hours), minutes);
+    setDate(newDate);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startTime || !endTime || !title) {
+    if (!startTime || !endTime || !title || !description) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -48,7 +57,7 @@ export default function ElectionForm({ action, election }: ElectionFormProps) {
 
     setIsLoading(true);
     try {
-        const result = await action({ title, startTime, endTime });
+        const result = await action({ title, description, startTime, endTime });
         toast({
             title: 'Success!',
             description: `Election has been ${election ? 'updated' : 'created'}.`,
@@ -81,57 +90,88 @@ export default function ElectionForm({ action, election }: ElectionFormProps) {
                 required
             />
         </div>
+        <div>
+            <Label htmlFor="description">Election Description</Label>
+            <Textarea 
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Briefly describe the purpose of this election."
+                required
+            />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-            <Label>Start Date</Label>
-            <Popover>
-                <PopoverTrigger asChild>
-                <Button
-                    variant={'outline'}
-                    className={cn(
-                    'w-full justify-start text-left font-normal',
-                    !startTime && 'text-muted-foreground'
-                    )}
-                >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startTime ? format(startTime, 'PPP p') : <span>Pick a date</span>}
-                </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                <Calendar
-                    mode="single"
-                    selected={startTime}
-                    onSelect={setStartTime}
-                    initialFocus
-                />
-                </PopoverContent>
-            </Popover>
+                <Label>Start Date & Time</Label>
+                <div className="flex gap-2">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <Button
+                            variant={'outline'}
+                            className={cn(
+                            'w-full justify-start text-left font-normal',
+                            !startTime && 'text-muted-foreground'
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {startTime ? format(startTime, 'PPP') : <span>Pick a date</span>}
+                        </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                        <Calendar
+                            mode="single"
+                            selected={startTime}
+                            onSelect={setStartTime}
+                            initialFocus
+                        />
+                        </PopoverContent>
+                    </Popover>
+                    <Input 
+                        type="time" 
+                        className="w-[120px]"
+                        value={startTime ? format(startTime, 'HH:mm') : ''}
+                        onChange={(e) => handleTimeChange(startTime, setStartTime, e.target.value)}
+                        disabled={!startTime}
+                    />
+                </div>
             </div>
             <div className="space-y-2">
-            <Label>End Date</Label>
-            <Popover>
-                <PopoverTrigger asChild>
-                <Button
-                    variant={'outline'}
-                    className={cn(
-                    'w-full justify-start text-left font-normal',
-                    !endTime && 'text-muted-foreground'
-                    )}
-                >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endTime ? format(endTime, 'PPP p') : <span>Pick a date</span>}
-                </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                <Calendar
-                    mode="single"
-                    selected={endTime}
-                    onSelect={setEndTime}
-                    initialFocus
-                />
-                </PopoverContent>
-            </Popover>
+                <Label>End Date & Time</Label>
+                <div className="flex gap-2">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <Button
+                            variant={'outline'}
+                            className={cn(
+                            'w-full justify-start text-left font-normal',
+                            !endTime && 'text-muted-foreground'
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {endTime ? format(endTime, 'PPP') : <span>Pick a date</span>}
+                        </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                        <Calendar
+                            mode="single"
+                            selected={endTime}
+                            onSelect={setEndTime}
+                            initialFocus
+                        />
+                        </PopoverContent>
+                    </Popover>
+                     <Input 
+                        type="time" 
+                        className="w-[120px]"
+                        value={endTime ? format(endTime, 'HH:mm') : ''}
+                        onChange={(e) => handleTimeChange(endTime, setEndTime, e.target.value)}
+                        disabled={!endTime}
+                    />
+                </div>
             </div>
+        </div>
+        <div className='text-sm text-muted-foreground text-center'>
+            {startTime && endTime && `Duration: ${format(startTime, 'Pp')} to ${format(endTime, 'Pp')}`}
         </div>
         <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

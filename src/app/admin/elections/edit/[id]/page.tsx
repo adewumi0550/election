@@ -21,7 +21,7 @@ export default async function EditElectionPage({ params }: { params: { id: strin
         'use server';
         await updateElection(params.id, data);
         revalidatePath(`/admin/elections/edit/${params.id}`);
-        redirect(`/admin/elections/edit/${params.id}`);
+        // No need to redirect, just let the page re-render with fresh data.
     }
 
     async function handleAddVoter(formData: FormData) {
@@ -63,7 +63,7 @@ export default async function EditElectionPage({ params }: { params: { id: strin
                         <CardHeader>
                             <CardTitle>Election Settings</CardTitle>
                             <CardDescription>
-                                Update the election timeframe and title.
+                                Update the election timeframe, title, and description.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

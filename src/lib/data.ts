@@ -8,6 +8,7 @@ let elections: Election[] = [
     {
       id: 'election-2024',
       title: 'Student Union General Election 2024',
+      description: 'The annual general election for the student union representatives.',
       startTime: new Date(Date.now() - 24 * 60 * 60 * 1000), // Default start time: 1 day ago
       endTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Default end time: 2 days from now
     }
