@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, LogOut, FileText, Settings, Users, Vote } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { LayoutDashboard, LogOut, FileText, Settings, Users, Vote, Loader2 } from 'lucide-react';
 
 import {
   SidebarProvider,
@@ -19,9 +19,24 @@ import {
 } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/app-logo';
 import { Button } from '@/components/ui/button';
+import { AuthProvider, useAuth } from '@/hooks/use-auth';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const router = useRouter();
+    const { user, loading, signOut } = useAuth();
+    
+    const handleSignOut = async () => {
+        await signOut();
+        router.push('/login');
+    };
+
+    React.useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login');
+        }
+    }, [user, loading, router]);
+
 
     const menuItems = [
       { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -30,6 +45,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       { href: '/admin/manifesto-writer', label: 'Manifesto Writer', icon: FileText },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
     ];
+
+    if (loading || !user) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+        );
+    }
   
     return (
       <SidebarProvider>
@@ -55,11 +78,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-             <Link href="/" className="w-full">
-              <Button variant="ghost" className="w-full justify-start gap-2">
-                <LogOut /> Back to Main Site
+             <Button variant="ghost" className="w-full justify-start gap-2" onClick={handleSignOut}>
+                <LogOut /> Sign Out
               </Button>
-            </Link>
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
@@ -72,4 +93,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </SidebarInset>
       </SidebarProvider>
     );
+}
+
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AuthProvider>
+  );
 }

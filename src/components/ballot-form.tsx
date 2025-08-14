@@ -20,6 +20,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 interface BallotFormProps {
   offices: Office[];
@@ -31,6 +33,8 @@ export default function BallotForm({ offices, candidates, electionId }: BallotFo
   const [ballot, setBallot] = useState<Ballot>({});
   const [isLoading, setIsLoading] = useState(false);
   const [hasVoted, setHasVoted] = useState(true); // Default to true to prevent flash of content
+  const [matric, setMatric] = useState('');
+  const [showBallot, setShowBallot] = useState(false);
   const { toast } = useToast();
   
   const ELECTION_VOTED_KEY = `election-${electionId}-voted`;
@@ -44,12 +48,19 @@ export default function BallotForm({ offices, candidates, electionId }: BallotFo
     setBallot((prev) => ({ ...prev, [officeId]: candidateId }));
   };
 
+  const handleMatricSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!matric) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Please enter your Matric/Username.' });
+        return;
+    }
+    // Simple check to show ballot. Real validation happens on submit.
+    setShowBallot(true);
+  }
+
   const handleSubmit = async () => {
     setIsLoading(true);
-    // In a real app, voterId would come from an auth system
-    const voterId = `voter-${Math.random().toString(36).substring(7)}`; 
-
-    const result = await submitVote(electionId, voterId, ballot);
+    const result = await submitVote(electionId, matric, ballot);
 
     if (result.success) {
       localStorage.setItem(ELECTION_VOTED_KEY, 'true');
@@ -64,6 +75,10 @@ export default function BallotForm({ offices, candidates, electionId }: BallotFo
         title: "Submission Failed",
         description: result.message,
       });
+      // If vote failed, maybe matric was wrong, so we allow re-entry.
+      if (result.message.includes('not found')) {
+        setShowBallot(false);
+      }
     }
     setIsLoading(false);
   };
@@ -81,9 +96,34 @@ export default function BallotForm({ offices, candidates, electionId }: BallotFo
     );
   }
 
+  if (!showBallot) {
+    return (
+        <Card className="max-w-md mx-auto">
+            <CardHeader>
+                <CardTitle>Voter Verification</CardTitle>
+                <CardDescription>Please enter your Matriculation or Username to proceed.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleMatricSubmit} className="space-y-4">
+                    <div>
+                        <Label htmlFor="matric">Matric/Username</Label>
+                        <Input 
+                            id="matric" 
+                            value={matric} 
+                            onChange={(e) => setMatric(e.target.value)} 
+                            required 
+                            placeholder="e.g., 123456 or johndoe"
+                        />
+                    </div>
+                    <Button type="submit" className="w-full">Proceed to Ballot</Button>
+                </form>
+            </CardContent>
+        </Card>
+    )
+  }
+
   const officesWithCandidates = offices.filter(office => candidates.some(c => c.officeId === office.id));
   const isBallotComplete = officesWithCandidates.length === Object.keys(ballot).length;
-
 
   return (
     <div className="space-y-8">

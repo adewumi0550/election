@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BarChart2, Home, LogIn, Shield } from 'lucide-react';
-
+import { AuthProvider, useAuth } from '@/hooks/use-auth';
 import {
   SidebarProvider,
   Sidebar,
@@ -20,12 +20,13 @@ import {
 import { AppLogo } from '@/components/app-logo';
 import { Button } from './ui/button';
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+
+function AppShellContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdminPage = pathname.startsWith('/admin');
 
   if (isAdminPage) {
-    return children; // Admin layout will handle its own shell
+    return children;
   }
 
   const menuItems = [
@@ -74,4 +75,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </SidebarInset>
     </SidebarProvider>
   );
+}
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+    return (
+        <AuthProvider>
+            <AppShellContent>{children}</AppShellContent>
+        </AuthProvider>
+    )
 }

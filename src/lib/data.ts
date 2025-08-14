@@ -16,7 +16,7 @@ const votersCollection = collection(db, 'voters');
 export async function getElections(): Promise<Election[]> {
   const snapshot = await getDocs(electionsCollection);
   const elections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Election));
-  return elections.sort((a,b) => b.startTime.getTime() - a.startTime.getTime());
+  return elections.sort((a,b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 }
 
 export async function getElection(id: string): Promise<Election | undefined> {
@@ -108,10 +108,10 @@ export async function submitVote(electionId: string, voterId: string, ballot: Ba
   const voterSnapshot = await getDocs(voterQuery);
   
   if (voterSnapshot.empty) {
-    return { success: false, message: 'Voter not found in the voter roll.' };
+    return { success: false, message: 'Matric/Username not found in the voter roll for this election.' };
   }
-  const voter = { id: voterSnapshot.docs[0].id, ...voterSnapshot.docs[0].data()} as Voter;
-
+  const voterDoc = voterSnapshot.docs[0];
+  const voter = { id: voterDoc.id, ...voterDoc.data()} as Voter;
 
   const voteQuery = query(votesCollection, where('voterId', '==', voter.id), where('electionId', '==', electionId));
   const voteSnapshot = await getDocs(voteQuery);
