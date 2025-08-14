@@ -3,8 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart2, Home, LogIn, Shield } from 'lucide-react';
-import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { BarChart2, Home } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -18,8 +17,6 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/app-logo';
-import { Button } from './ui/button';
-
 
 function AppShellContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -74,8 +71,6 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
     return (
-        <AuthProvider>
-            <AppShellContent>{children}</AppShellContent>
-        </AuthProvider>
+        <AppShellContent>{children}</AppShellContent>
     )
 }

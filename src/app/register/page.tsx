@@ -1,136 +1,76 @@
-
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { UserPlus, Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import * as React from 'react';
 import Link from 'next/link';
-import { createAdminUser } from '@/lib/data';
+import { usePathname } from 'next/navigation';
+import { BarChart2, Home } from 'lucide-react';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
+  SidebarTrigger,
+  SidebarInset,
+} from '@/components/ui/sidebar';
+import { AppLogo } from '@/components/app-logo';
 
-export default function RegisterPage() {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+function AppShellContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isAdminPage = pathname.startsWith('/admin');
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    if (password.length < 6) {
-        toast({
-            variant: 'destructive',
-            title: 'Registration Failed',
-            description: 'Password must be at least 6 characters long.',
-        });
-        setIsLoading(false);
-        return;
-    }
+  if (isAdminPage) {
+    return children;
+  }
 
-    try {
-      const result = await createAdminUser(name, email, password);
-
-      if (result.success) {
-        toast({ title: 'Registration Successful', description: result.message });
-        setIsSuccess(true);
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Registration Failed',
-          description: result.message,
-        });
-      }
-    } catch (error: any) {
-        toast({
-            variant: 'destructive',
-            title: 'Registration Failed',
-            description: 'An unexpected error occurred during registration.',
-        });
-    }
-
-    setIsLoading(false);
-  };
+  const menuItems = [
+    { href: '/', label: 'Vote', icon: Home },
+    { href: '/results', label: 'Results', icon: BarChart2 },
+  ];
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
-      <Card className="w-full max-w-sm">
-        {isSuccess ? (
-            <>
-                <CardHeader className="text-center">
-                    <UserPlus className="mx-auto h-12 w-12 text-primary" />
-                    <CardTitle className="mt-4">Registration Successful!</CardTitle>
-                    <CardDescription>Your account has been created. You can now log in to the admin panel.</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                    <Button asChild className="w-full">
-                        <Link href="/admin-login">Proceed to Sign In</Link>
-                    </Button>
-                </CardFooter>
-            </>
-        ) : (
-            <form onSubmit={handleRegister}>
-            <CardHeader className="text-center">
-                <UserPlus className="mx-auto h-12 w-12 text-primary" />
-                <CardTitle className="mt-4">Create Admin Account</CardTitle>
-                <CardDescription>Fill in the details to create an administrator account.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                        id="name"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        placeholder="John Doe"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        placeholder="admin@example.com"
-                    />
-                </div>
-                <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="••••••••"
-                />
-                </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-4">
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Account
-                </Button>
-                 <Button asChild variant="link" className="w-full">
-                    <Link href="/admin-login">
-                        Already have an account? Sign In
-                    </Link>
-                </Button>
-            </CardFooter>
-            </form>
-        )}
-      </Card>
-    </div>
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarHeader>
+          <AppLogo />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            {menuItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <Link href={item.href}>
+                  <SidebarMenuButton
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter>
+        </SidebarFooter>
+      </Sidebar>
+      <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:h-auto md:border-none md:bg-transparent md:px-6">
+            <div className="md:hidden">
+                <SidebarTrigger />
+            </div>
+        </header>
+        <main>{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
+}
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+    return (
+        <AppShellContent>{children}</AppShellContent>
+    )
 }

@@ -1,98 +1,76 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Shield, Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { BarChart2, Home } from 'lucide-react';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
+  SidebarTrigger,
+  SidebarInset,
+} from '@/components/ui/sidebar';
+import { AppLogo } from '@/components/app-logo';
 
-export default function LoginPage() {
-  const router = useRouter();
-  const { signIn } = useAuth();
-  const { toast } = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+function AppShellContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isAdminPage = pathname.startsWith('/admin');
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const result = await signIn(email, password);
-       if (result.success) {
-        toast({ title: 'Login Successful', description: 'Redirecting to dashboard...' });
-        router.push('/admin');
-      } else {
-         toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: result.message,
-        });
-      }
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: error.message || 'An unexpected error occurred.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  if (isAdminPage) {
+    return children;
+  }
+
+  const menuItems = [
+    { href: '/', label: 'Vote', icon: Home },
+    { href: '/results', label: 'Results', icon: BarChart2 },
+  ];
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
-      <Card className="w-full max-w-sm">
-        <form onSubmit={handleLogin}>
-          <CardHeader className="text-center">
-            <Shield className="mx-auto h-12 w-12 text-primary" />
-            <CardTitle className="mt-4">Admin Panel</CardTitle>
-            <CardDescription>Enter your credentials to access the dashboard.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="admin@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-             <div className="flex justify-between items-center text-sm">
-                <Link href="/register" passHref className="text-muted-foreground hover:text-primary underline">
-                  Create an account
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarHeader>
+          <AppLogo />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            {menuItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <Link href={item.href}>
+                  <SidebarMenuButton
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
                 </Link>
-                <Link href="/forgot-password" passHref className="text-muted-foreground hover:text-primary underline">
-                  Forgot password?
-                </Link>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter>
+        </SidebarFooter>
+      </Sidebar>
+      <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:h-auto md:border-none md:bg-transparent md:px-6">
+            <div className="md:hidden">
+                <SidebarTrigger />
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
+        </header>
+        <main>{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
+}
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+    return (
+        <AppShellContent>{children}</AppShellContent>
+    )
 }
