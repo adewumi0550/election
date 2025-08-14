@@ -12,14 +12,17 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
 import type { Office, Election } from '@/lib/types';
+import { useState } from 'react';
+import Image from 'next/image';
 
 const candidateSchema = z.object({
   fullName: z.string().min(3, 'Full name is required'),
   officeId: z.string().min(1, 'Office is required'),
   manifesto: z.string().min(10, 'Manifesto is required'),
   electionId: z.string().min(1, 'Election is required'),
+  photo: z.any().refine((files) => files?.length === 1, 'Image is required.'),
 });
 
 type CandidateFormValues = z.infer<typeof candidateSchema>;
@@ -33,29 +36,54 @@ interface AddCandidateFormProps {
 export default function AddCandidateForm({ offices, elections, selectedElectionId }: AddCandidateFormProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<CandidateFormValues>({
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  const { control, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<CandidateFormValues>({
     resolver: zodResolver(candidateSchema),
     defaultValues: {
       fullName: '',
       officeId: '',
       manifesto: '',
       electionId: selectedElectionId || '',
+      photo: undefined,
     },
+  });
+
+  const photoField = watch('photo');
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+        setPhotoPreview(null);
+    }
+  };
+
+  const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
   });
 
   const handleAddCandidate = async (data: CandidateFormValues) => {
     try {
+      const photoBase64 = await toBase64(data.photo[0]);
       await addCandidate({
-        ...data,
-        photoUrl: 'https://placehold.co/400x400.png',
+        fullName: data.fullName,
+        officeId: data.officeId,
+        manifesto: data.manifesto,
+        electionId: data.electionId,
+        photoUrl: photoBase64,
         'data-ai-hint': 'person portrait',
       });
       toast({ title: 'Success', description: 'Candidate added successfully.' });
-      // This is a client component, so we can't use revalidatePath directly.
-      // We'll trigger a re-render by navigating.
       router.refresh();
-      // A full refresh might be needed if revalidatePath isn't sufficient from the server action.
-      // This ensures the list component gets the new data.
       window.location.href = `/admin/candidates?electionId=${data.electionId}`;
     } catch (error) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to add candidate.' });
@@ -128,6 +156,42 @@ export default function AddCandidateForm({ offices, elections, selectedElectionI
               )}
             />
             {errors.officeId && <p className="text-sm text-destructive mt-1">{errors.officeId.message}</p>}
+          </div>
+          
+          <div>
+            <Label htmlFor="photo">Candidate Photo</Label>
+            <Controller
+              name="photo"
+              control={control}
+              render={({ field: { onChange, value, ...rest } }) => (
+                <>
+                  <Input 
+                    id="photo"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    {...rest}
+                    onChange={(e) => {
+                        onChange(e.target.files);
+                        handlePhotoChange(e);
+                    }}
+                  />
+                  <Label htmlFor="photo" className="cursor-pointer">
+                      <div className="mt-1 flex justify-center items-center w-full h-32 px-6 border-2 border-dashed rounded-md">
+                          {photoPreview ? (
+                                <Image src={photoPreview} alt="Candidate preview" width={100} height={100} className="object-cover rounded-full h-28 w-28" />
+                          ) : (
+                                <div className="text-center">
+                                    <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                                    <p className="text-sm text-muted-foreground mt-2">Click to upload image</p>
+                                </div>
+                          )}
+                      </div>
+                  </Label>
+                </>
+              )}
+            />
+            {errors.photo && <p className="text-sm text-destructive mt-1">{errors.photo.message?.toString()}</p>}
           </div>
 
           <div>
