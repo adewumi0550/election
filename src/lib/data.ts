@@ -5,8 +5,6 @@ import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, 
 import { db as adminDb, auth as serverAuth } from './firebase-admin';
 import { db as clientDb } from './firebase';
 import type { Candidate, Election, Office, Vote, Ballot, ElectionResult, Voter, Admin } from './types';
-import { getAuth } from 'firebase-admin/auth';
-
 
 // CLIENT-SIDE SAFE FUNCTIONS
 export async function getElectionsClient(): Promise<Election[]> {
@@ -41,10 +39,9 @@ export async function getOfficesClient(): Promise<Office[]> {
 
 // ADMIN API
 export async function createAdminUser(name: string, email: string, pass: string) {
-    const auth = getAuth(serverAuth);
     const adminsCollection = collection(adminDb, 'admins');
     try {
-        const userRecord = await auth.createUser({
+        const userRecord = await serverAuth.createUser({
             email,
             password: pass,
             displayName: name,
