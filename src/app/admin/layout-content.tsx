@@ -54,14 +54,7 @@ export default function AdminLayoutContent({ children }: { children: React.React
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-             <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Sign Out">
-                        <LogOut />
-                        <span>Sign Out</span>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            </SidebarMenu>
+             {/* Sign Out button removed as auth is disabled */}
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>

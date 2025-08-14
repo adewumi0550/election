@@ -1,7 +1,6 @@
 import AdminLayoutContent from './layout-content';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AdminLayoutContent>{children}</AdminLayoutContent>
-  );
+  // No auth provider needed
+  return <AdminLayoutContent>{children}</AdminLayoutContent>;
 }
