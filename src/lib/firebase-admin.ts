@@ -1,11 +1,8 @@
 
 import admin from 'firebase-admin';
-import { config } from 'dotenv';
-
-// Load environment variables from .env file
-config();
 
 // --- VITAL: Environment Variable Check ---
+// The `dev` script in package.json ensures that variables from `.env` are loaded.
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
   throw new Error(
     'Firebase Admin initialization failed. The environment variable FIREBASE_SERVICE_ACCOUNT_BASE64 is missing. ' +
