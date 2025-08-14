@@ -39,26 +39,37 @@ export async function getOfficesClient(): Promise<Office[]> {
 
 // ADMIN API
 export async function createAdminUser(name: string, email: string, pass: string): Promise<{ success: boolean; message: string; }> {
-    const userRecord = await serverAuth.createUser({
-        email,
-        password: pass,
-        displayName: name,
-    });
-    
-    const adminsCollection = collection(adminDb, 'admins');
+    try {
+        const userRecord = await serverAuth.createUser({
+            email,
+            password: pass,
+            displayName: name,
+        });
+        
+        const adminsCollection = collection(adminDb, 'admins');
 
-    const adminData: Admin = {
-        uid: userRecord.uid,
-        name,
-        email,
-        status: false,
-        verified: false,
-        restricted: true,
-    };
+        const adminData: Admin = {
+            uid: userRecord.uid,
+            name,
+            email,
+            status: false,
+            verified: false,
+            restricted: true,
+        };
 
-    await setDoc(doc(adminsCollection, userRecord.uid), adminData);
+        await setDoc(doc(adminsCollection, userRecord.uid), adminData);
 
-    return { success: true, message: 'Account created. Please wait for admin approval.' };
+        return { success: true, message: 'Account created. Please wait for admin approval.' };
+
+    } catch (error: any) {
+        let message = 'An unexpected error occurred.';
+        if (error.code === 'auth/email-already-exists') {
+            message = 'This email is already registered.';
+        } else if (error.message) {
+            message = error.message;
+        }
+        return { success: false, message: message };
+    }
 }
 
 export async function getAdminUser(uid: string): Promise<Admin | null> {
