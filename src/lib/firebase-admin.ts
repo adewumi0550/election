@@ -1,42 +1,34 @@
 
 import admin from 'firebase-admin';
+import { config } from 'dotenv';
+
+// Load environment variables from .env file
+config();
 
 // --- VITAL: Environment Variable Check ---
-// The Firebase Admin SDK needs these server-side environment variables to initialize.
-// If any of these are missing, the initialization will fail.
-const requiredEnvVars = [
-  'FIREBASE_PROJECT_ID',
-  'FIREBASE_CLIENT_EMAIL',
-  'FIREBASE_PRIVATE_KEY',
-  'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-];
-
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
-
-if (missingEnvVars.length > 0) {
-  // If required variables are missing, throw a detailed error.
-  // This stops the app from crashing with a vague "Firebase app does not exist" error later on.
+if (!process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
   throw new Error(
-    `Firebase Admin initialization failed. The following environment variables are missing: ${missingEnvVars.join(', ')}. ` +
-    "Please check your .env file and ensure you have copied the service account credentials correctly from your Firebase project settings."
+    'Firebase Admin initialization failed. The environment variable FIREBASE_SERVICE_ACCOUNT_BASE64 is missing. ' +
+    "Please encode your entire service account JSON file to base64 and set it as this variable in your .env file."
   );
 }
-// -----------------------------------------
 
 if (!admin.apps.length) {
   try {
+    // Decode the base64-encoded service account key
+    const serviceAccountJson = Buffer.from(
+      process.env.FIREBASE_SERVICE_ACCOUNT_BASE64,
+      'base64'
+    ).toString('utf8');
+    
+    const serviceAccount = JSON.parse(serviceAccountJson);
+
     admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        // The private key needs to have its escaped newlines replaced with actual newlines.
-        privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-      }),
+      credential: admin.credential.cert(serviceAccount),
       storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     });
   } catch (error: any) {
-    // This catch block will now likely only catch unexpected initialization errors,
-    // as the environment variable check above handles the most common failure case.
+    // This will now catch errors related to base64 decoding or JSON parsing, providing clearer feedback.
     console.error('Firebase admin initialization error:', error);
     throw new Error('Failed to initialize Firebase Admin SDK. Original error: ' + error.message);
   }
