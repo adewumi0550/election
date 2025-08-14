@@ -71,7 +71,7 @@ export default function RegisterPage() {
                 </CardHeader>
                 <CardFooter>
                     <Button asChild className="w-full">
-                        <Link href="/login">Back to Sign In</Link>
+                        <Link href="/admin-login">Back to Sign In</Link>
                     </Button>
                 </CardFooter>
             </>
@@ -123,7 +123,7 @@ export default function RegisterPage() {
                     Request Account
                 </Button>
                  <Button asChild variant="link" className="w-full">
-                    <Link href="/login">
+                    <Link href="/admin-login">
                         Already have an account? Sign In
                     </Link>
                 </Button>

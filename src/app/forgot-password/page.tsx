@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
                 </CardHeader>
                 <CardFooter>
                     <Button asChild className="w-full">
-                        <Link href="/login">Back to Sign In</Link>
+                        <Link href="/admin-login">Back to Sign In</Link>
                     </Button>
                 </CardFooter>
             </>
@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
                 Send Reset Link
                 </Button>
                  <Button asChild variant="link" className="w-full">
-                    <Link href="/login">
+                    <Link href="/admin-login">
                         Back to Sign In
                     </Link>
                 </Button>

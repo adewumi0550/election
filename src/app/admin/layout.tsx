@@ -28,12 +28,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     
     const handleSignOut = async () => {
         await signOut();
-        router.push('/login');
+        router.push('/admin-login');
     };
 
     React.useEffect(() => {
         if (!loading && !user) {
-            router.push('/login');
+            router.push('/admin-login');
         }
     }, [user, loading, router]);
 

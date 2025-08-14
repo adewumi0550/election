@@ -58,11 +58,6 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-           <Link href="/login" className="w-full">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Shield /> Admin Panel
-            </Button>
-          </Link>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
