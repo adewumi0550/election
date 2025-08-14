@@ -1,0 +1,40 @@
+export interface Election {
+  id: string;
+  title: string;
+  startTime: Date;
+  endTime: Date;
+}
+
+export interface Office {
+  id: string;
+  name: string;
+  order: number;
+}
+
+export interface Candidate {
+  id: string;
+  fullName: string;
+  photoUrl: string;
+  manifesto: string;
+  officeId: string;
+}
+
+export type Ballot = Record<string, string>; // officeId: candidateId
+
+export interface Vote {
+  id: string;
+  voterId: string; // A unique identifier for the voter
+  electionId: string;
+  ballot: Ballot;
+  createdAt: Date;
+}
+
+export interface ElectionResult {
+    officeId: string;
+    officeName: string;
+    results: {
+        candidateId: string;
+        candidateName: string;
+        votes: number;
+    }[];
+}
