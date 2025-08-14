@@ -38,7 +38,7 @@ if (!admin.apps.length) {
     // This catch block will now likely only catch unexpected initialization errors,
     // as the environment variable check above handles the most common failure case.
     console.error('Firebase admin initialization error:', error);
-    throw new Error('Failed to initialize Firebase Admin SDK. See server logs for details.');
+    throw new Error('Failed to initialize Firebase Admin SDK. Original error: ' + error.message);
   }
 }
 
