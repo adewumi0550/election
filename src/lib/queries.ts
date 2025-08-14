@@ -1,11 +1,17 @@
-
+import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { db } from './firebase';
 import type { Candidate, Election, Office } from './types';
 
-// CLIENT-SIDE QUERIES (STUBBED)
+// CLIENT-SIDE QUERIES
 
 export async function getElectionsClient(): Promise<Election[]> {
-  console.log("getElectionsClient called. Firebase is not configured. Returning empty array.");
-  return [];
+  const electionsSnapshot = await getDocs(collection(db, 'elections'));
+  return electionsSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    startTime: (doc.data().startTime as Timestamp).toDate(),
+    endTime: (doc.data().endTime as Timestamp).toDate(),
+  } as Election)).sort((a,b) => b.startTime.getTime() - a.startTime.getTime());
 }
 
 export async function getOfficesClient(): Promise<Office[]> {
@@ -27,10 +33,13 @@ export async function getOfficesClient(): Promise<Office[]> {
     { id: 'health-2', name: 'Health Officer II', order: 15 },
     { id: 'food-dir', name: 'Food Directors', order: 16 },
   ];
+  // In a real app, you might fetch this from Firestore as well
   return Promise.resolve(fixedOffices.sort((a, b) => a.order - b.order));
 }
 
 export async function getCandidatesClient(electionId?: string): Promise<Candidate[]> {
-    console.log("getCandidatesClient called. Firebase is not configured. Returning empty array.");
-    return [];
+    if (!electionId) return [];
+    const q = query(collection(db, 'candidates'), where('electionId', '==', electionId));
+    const candidatesSnapshot = await getDocs(q);
+    return candidatesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Candidate));
 }

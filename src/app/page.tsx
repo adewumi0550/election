@@ -36,7 +36,7 @@ export default function HomePage() {
 
       } catch (err: any) {
         console.error("Failed to fetch initial election data:", err);
-        setError("There was a problem fetching data. The application is not connected to a database. Please configure Firebase.");
+        setError("Could not connect to the database. Please check your Firebase configuration and internet connection.");
       } finally {
         setLoading(false);
       }

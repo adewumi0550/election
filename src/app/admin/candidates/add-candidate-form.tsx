@@ -16,6 +16,8 @@ import { Loader2, Upload } from 'lucide-react';
 import type { Office, Election } from '@/lib/types';
 import { useState } from 'react';
 import Image from 'next/image';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { storage } from '@/lib/firebase';
 
 const candidateSchema = z.object({
   fullName: z.string().min(3, 'Full name is required'),
@@ -73,22 +75,27 @@ export default function AddCandidateForm({ offices, elections, selectedElectionI
 
   const handleAddCandidate = async (data: CandidateFormValues) => {
     try {
-      // Photo upload is disabled as Firebase Storage is not configured.
-      // const photoBase64 = await toBase64(data.photo[0]);
+      const photoFile = data.photo[0];
+      const photoBase64 = await toBase64(photoFile);
+
+      const storageRef = ref(storage, `candidates/${data.electionId}/${Date.now()}_${photoFile.name}`);
+      const uploadTask = await uploadString(storageRef, photoBase64, 'data_url');
+      const photoUrl = await getDownloadURL(uploadTask.ref);
+      
       await addCandidate({
         fullName: data.fullName,
         officeId: data.officeId,
         manifesto: data.manifesto,
         electionId: data.electionId,
-        photoUrl: "https://placehold.co/100x100.png", // Using a placeholder
+        photoUrl: photoUrl,
         'data-ai-hint': 'person portrait',
       });
-      toast({ title: 'Success', description: 'Candidate added successfully (using placeholder image).' });
+      toast({ title: 'Success', description: 'Candidate added successfully.' });
       router.refresh();
       // A full page reload might be better here to ensure all state is reset.
       window.location.href = `/admin/candidates?electionId=${data.electionId}`;
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to add candidate. Firebase might not be configured.' });
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Error', description: `Failed to add candidate: ${error.message}` });
     }
   };
   

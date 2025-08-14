@@ -1,6 +1,10 @@
+import { AuthProvider } from '@/hooks/use-auth';
 import AdminLayoutContent from './layout-content';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  // No auth provider needed
-  return <AdminLayoutContent>{children}</AdminLayoutContent>;
+  return (
+    <AuthProvider>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AuthProvider>
+  );
 }
