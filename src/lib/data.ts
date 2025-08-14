@@ -7,16 +7,10 @@ import type { Candidate, Election, Office, Vote, Ballot, ElectionResult, Voter, 
 import { getAuth } from 'firebase-admin/auth';
 
 
-const electionsCollection = collection(db, 'elections');
-const officesCollection = collection(db, 'offices');
-const candidatesCollection = collection(db, 'candidates');
-const votesCollection = collection(db, 'votes');
-const votersCollection = collection(db, 'voters');
-const adminsCollection = collection(db, 'admins');
-
 // ADMIN API
 export async function createAdminUser(name: string, email: string, pass: string) {
     const auth = getAuth(serverAuth);
+    const adminsCollection = collection(db, 'admins');
     try {
         const userRecord = await auth.createUser({
             email,
@@ -56,6 +50,7 @@ export async function getAdminUser(uid: string): Promise<Admin | null> {
 
 // ELECTION API
 export async function getElections(): Promise<Election[]> {
+  const electionsCollection = collection(db, 'elections');
   const snapshot = await getDocs(electionsCollection);
   const elections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Election));
   return elections.sort((a,b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
@@ -71,6 +66,7 @@ export async function getElection(id: string): Promise<Election | undefined> {
 }
 
 export async function createElection(election: Omit<Election, 'id'>): Promise<Election> {
+    const electionsCollection = collection(db, 'elections');
     const docRef = await addDoc(electionsCollection, election);
     return { ...election, id: docRef.id };
 }
@@ -107,6 +103,7 @@ export async function getOffices(): Promise<Office[]> {
 
 // CANDIDATE API
 export async function getCandidates(electionId?: string): Promise<Candidate[]> {
+    const candidatesCollection = collection(db, 'candidates');
     let q = query(candidatesCollection);
     if (electionId) {
         q = query(candidatesCollection, where('electionId', '==', electionId));
@@ -126,6 +123,7 @@ export async function getCandidate(id: string): Promise<Candidate | undefined> {
 
 
 export async function addCandidate(candidate: Omit<Candidate, 'id'>): Promise<Candidate> {
+  const candidatesCollection = collection(db, 'candidates');
   const docRef = await addDoc(candidatesCollection, candidate);
   return { ...candidate, id: docRef.id };
 }
@@ -146,6 +144,9 @@ export async function deleteCandidate(id: string): Promise<{ success: boolean }>
 // VOTE API
 export async function submitVote(electionId: string, voterId: string, ballot: Ballot): Promise<{ success: boolean; message: string }> {
   // Use matric as voterId, but check for existing votes using matric.
+  const votersCollection = collection(db, 'voters');
+  const votesCollection = collection(db, 'votes');
+  
   const voterQuery = query(votersCollection, where('matric', '==', voterId), where('electionId', '==', electionId));
   const voterSnapshot = await getDocs(voterQuery);
   
@@ -174,6 +175,7 @@ export async function submitVote(electionId: string, voterId: string, ballot: Ba
 
 
 export async function getElectionResults(electionId: string): Promise<ElectionResult[]> {
+    const votesCollection = collection(db, 'votes');
     const offices = await getOffices();
     const candidates = await getCandidates(electionId);
     const votesQuery = query(votesCollection, where('electionId', '==', electionId));
@@ -211,12 +213,14 @@ export async function getElectionResults(electionId: string): Promise<ElectionRe
 
 // VOTER API
 export async function getVoters(electionId: string): Promise<Voter[]> {
+    const votersCollection = collection(db, 'voters');
     const q = query(votersCollection, where('electionId', '==', electionId));
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Voter));
 }
 
 export async function addVoter(voter: Omit<Voter, 'id'>): Promise<Voter> {
+    const votersCollection = collection(db, 'voters');
     const docRef = await addDoc(votersCollection, voter);
     return { ...voter, id: docRef.id };
 }
@@ -226,3 +230,4 @@ export async function deleteVoter(id: string): Promise<{ success: boolean }> {
     await deleteDoc(docRef);
     return { success: true };
 }
+
