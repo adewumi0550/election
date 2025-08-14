@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -34,18 +35,27 @@ export default function RegisterPage() {
         return;
     }
 
-    const result = await createAdminUser(name, email, password);
+    try {
+      const result = await createAdminUser(name, email, password);
 
-    if (result.success) {
-      toast({ title: 'Registration Submitted', description: result.message });
-      setIsSuccess(true);
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Registration Failed',
-        description: result.message,
-      });
+      if (result.success) {
+        toast({ title: 'Registration Submitted', description: result.message });
+        setIsSuccess(true);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Registration Failed',
+          description: result.message,
+        });
+      }
+    } catch (error: any) {
+        toast({
+            variant: 'destructive',
+            title: 'Registration Failed',
+            description: 'An unexpected error occurred during registration.',
+        });
     }
+
     setIsLoading(false);
   };
 
@@ -57,7 +67,7 @@ export default function RegisterPage() {
                 <CardHeader className="text-center">
                     <UserPlus className="mx-auto h-12 w-12 text-primary" />
                     <CardTitle className="mt-4">Registration Submitted</CardTitle>
-                    <CardDescription>Your request to become an admin has been submitted. You will be notified once an existing administrator approves your account.</CardDescription>
+                    <CardDescription>Your account has been created. Please contact an existing administrator to grant you access to the admin panel.</CardDescription>
                 </CardHeader>
                 <CardFooter>
                     <Button asChild className="w-full">
@@ -70,7 +80,7 @@ export default function RegisterPage() {
             <CardHeader className="text-center">
                 <UserPlus className="mx-auto h-12 w-12 text-primary" />
                 <CardTitle className="mt-4">Create Admin Account</CardTitle>
-                <CardDescription>Fill in the details to request an admin account. Access requires approval.</CardDescription>
+                <CardDescription>Fill in the details to request an admin account. Access requires approval from an existing admin.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">

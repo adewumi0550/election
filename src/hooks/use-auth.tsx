@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (!adminUser) {
         await firebaseSignOut(auth);
-        return { success: false, message: 'Admin account not found.' };
+        return { success: false, message: 'Admin account not found or not yet approved.' };
       }
       if (adminUser.restricted || !adminUser.status) {
         await firebaseSignOut(auth);
