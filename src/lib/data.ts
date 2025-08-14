@@ -114,13 +114,19 @@ export async function deleteCandidate(id: string): Promise<{ success: boolean }>
 
 // VOTE API
 export async function submitVote(electionId: string, voterId: string, ballot: Ballot): Promise<{ success: boolean; message: string }> {
-  if (votes.some(v => v.voterId === voterId && v.electionId === electionId)) {
+  // Use matric as voterId, but check for existing votes using matric.
+  const voter = voters.find(v => v.matric === voterId && v.electionId === electionId);
+  if (!voter) {
+    return { success: false, message: 'Voter not found in the voter roll.' };
+  }
+
+  if (votes.some(v => v.voterId === voter.id && v.electionId === electionId)) {
     return { success: false, message: 'You have already voted in this election.' };
   }
 
   const newVote: Vote = {
     id: `vote-${Date.now()}`,
-    voterId,
+    voterId: voter.id, // Use the internal voter ID
     electionId,
     ballot,
     createdAt: new Date(),

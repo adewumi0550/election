@@ -27,8 +27,11 @@ export default async function EditElectionPage({ params }: { params: { id: strin
     async function handleAddVoter(formData: FormData) {
         'use server';
         const name = formData.get('name') as string;
+        const matric = formData.get('matric') as string;
+        const level = formData.get('level') as string;
         const email = formData.get('email') as string;
-        await addVoter({ name, email, electionId: params.id });
+
+        await addVoter({ name, matric, level, email, electionId: params.id });
         revalidatePath(`/admin/elections/edit/${params.id}`);
     }
 

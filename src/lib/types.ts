@@ -45,6 +45,8 @@ export interface ElectionResult {
 export interface Voter {
   id: string;
   name: string;
-  email: string;
+  email?: string;
+  matric: string;
+  level: string;
   electionId: string;
 }
