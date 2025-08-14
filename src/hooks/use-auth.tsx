@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async (email: string, pass: string) => {
+  const signIn = async (email: string, pass: string): Promise<{success: boolean, message?: string}> => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, pass);
       const adminUser = await getAdminUser(userCredential.user.uid);
@@ -54,7 +55,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { success: true };
 
     } catch(error: any) {
-        return { success: false, message: error.message };
+        let message = 'An unexpected error occurred.';
+        if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+            message = 'Invalid email or password.';
+        } else {
+            message = error.message;
+        }
+        return { success: false, message };
     }
   };
 
