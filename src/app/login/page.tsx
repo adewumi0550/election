@@ -23,9 +23,17 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await signIn(email, password);
-      toast({ title: 'Login Successful', description: 'Redirecting to dashboard...' });
-      router.push('/admin');
+      const result = await signIn(email, password);
+       if (result.success) {
+        toast({ title: 'Login Successful', description: 'Redirecting to dashboard...' });
+        router.push('/admin');
+      } else {
+         toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: result.message,
+        });
+      }
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -68,7 +76,10 @@ export default function LoginPage() {
                 required
               />
             </div>
-             <div className="text-sm text-right">
+             <div className="flex justify-between items-center text-sm">
+                <Link href="/register" passHref className="text-muted-foreground hover:text-primary underline">
+                  Create an account
+                </Link>
                 <Link href="/forgot-password" passHref className="text-muted-foreground hover:text-primary underline">
                   Forgot password?
                 </Link>

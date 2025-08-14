@@ -50,3 +50,12 @@ export interface Voter {
   level: string;
   electionId: string;
 }
+
+export interface Admin {
+  uid: string;
+  name: string;
+  email: string;
+  status: boolean;
+  verified: boolean;
+  restricted: boolean;
+}

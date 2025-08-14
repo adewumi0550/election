@@ -1,15 +1,57 @@
 
 'use server';
 
-import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
-import { db } from './firebase';
-import type { Candidate, Election, Office, Vote, Ballot, ElectionResult, Voter } from './types';
+import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, setDoc } from 'firebase/firestore';
+import { db, auth as serverAuth } from './firebase-admin';
+import type { Candidate, Election, Office, Vote, Ballot, ElectionResult, Voter, Admin } from './types';
+import { getAuth } from 'firebase-admin/auth';
+
 
 const electionsCollection = collection(db, 'elections');
 const officesCollection = collection(db, 'offices');
 const candidatesCollection = collection(db, 'candidates');
 const votesCollection = collection(db, 'votes');
 const votersCollection = collection(db, 'voters');
+const adminsCollection = collection(db, 'admins');
+
+// ADMIN API
+export async function createAdminUser(name: string, email: string, pass: string) {
+    const auth = getAuth(serverAuth);
+    try {
+        const userRecord = await auth.createUser({
+            email,
+            password: pass,
+            displayName: name,
+        });
+
+        const adminData: Admin = {
+            uid: userRecord.uid,
+            name,
+            email,
+            status: false,
+            verified: false,
+            restricted: true,
+        };
+
+        await setDoc(doc(adminsCollection, userRecord.uid), adminData);
+
+        return { success: true, message: 'Account created. Please wait for admin approval.' };
+    } catch (error: any) {
+        if (error.code === 'auth/email-already-exists') {
+            return { success: false, message: 'An account with this email already exists.' };
+        }
+        return { success: false, message: error.message || 'Failed to create admin user.' };
+    }
+}
+
+export async function getAdminUser(uid: string): Promise<Admin | null> {
+    const docRef = doc(db, 'admins', uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return docSnap.data() as Admin;
+    }
+    return null;
+}
 
 
 // ELECTION API
