@@ -17,6 +17,8 @@ export interface Candidate {
   photoUrl: string;
   manifesto: string;
   officeId: string;
+  'data-ai-hint'?: string;
+  electionId: string;
 }
 
 export type Ballot = Record<string, string>; // officeId: candidateId
@@ -37,4 +39,11 @@ export interface ElectionResult {
         candidateName: string;
         votes: number;
     }[];
+}
+
+export interface Voter {
+  id: string;
+  name: string;
+  email: string;
+  electionId: string;
 }

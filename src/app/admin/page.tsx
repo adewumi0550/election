@@ -1,24 +1,37 @@
-import { getCandidates, getElection, getElectionResults } from '@/lib/data';
+import { getCandidates, getElections, getElectionResults } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Vote, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export default async function AdminDashboardPage() {
-    const election = await getElection();
-    const candidates = await getCandidates();
-    const results = await getElectionResults();
+    const elections = await getElections();
+    const activeElection = elections.find(e => new Date(e.startTime) <= new Date() && new Date(e.endTime) >= new Date()) || elections[0];
+
+    const candidates = activeElection ? await getCandidates(activeElection.id) : [];
+    const results = activeElection ? await getElectionResults(activeElection.id) : [];
 
     const totalVotes = results.reduce((total, office) => 
         total + office.results.reduce((officeTotal, cand) => officeTotal + cand.votes, 0), 0);
+    
+    const getElectionStatus = (election: any) => {
+        if (!election) return 'N/A';
+        const now = new Date();
+        if (now < new Date(election.startTime)) return 'Upcoming';
+        if (now > new Date(election.endTime)) return 'Ended';
+        return 'In Progress';
+    }
 
-    const electionStatus = new Date() < election.startTime ? 'Upcoming' : new Date() > election.endTime ? 'Ended' : 'In Progress';
+    const electionStatus = getElectionStatus(activeElection);
 
     return (
         <div className="container mx-auto p-4 md:p-8">
-            <h1 className="text-3xl font-bold tracking-tight text-primary mb-8">
+            <h1 className="text-3xl font-bold tracking-tight text-primary mb-2">
                 Admin Dashboard
             </h1>
+            <p className="text-muted-foreground mb-8">
+                Overview for {activeElection ? `"${activeElection.title}"` : 'the latest election'}.
+            </p>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 <Card>
@@ -56,14 +69,16 @@ export default async function AdminDashboardPage() {
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-4">
                     <Button asChild>
+                        <Link href="/admin/elections">Manage Elections</Link>
+                    </Button>
+                    <Button asChild variant="outline">
                         <Link href="/admin/candidates">Manage Candidates</Link>
                     </Button>
-                    <Button asChild variant="outline">
-                        <Link href="/admin/settings">Election Settings</Link>
-                    </Button>
-                    <Button asChild variant="outline">
-                        <Link href="/results">View Live Results</Link>
-                    </Button>
+                     {activeElection && (
+                        <Button asChild variant="outline">
+                            <Link href={`/results?electionId=${activeElection.id}`}>View Live Results</Link>
+                        </Button>
+                    )}
                 </CardContent>
             </Card>
         </div>

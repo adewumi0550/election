@@ -24,20 +24,21 @@ import {
 interface BallotFormProps {
   offices: Office[];
   candidates: Candidate[];
+  electionId: string;
 }
 
-const ELECTION_VOTED_KEY = 'election-2024-voted';
-
-export default function BallotForm({ offices, candidates }: BallotFormProps) {
+export default function BallotForm({ offices, candidates, electionId }: BallotFormProps) {
   const [ballot, setBallot] = useState<Ballot>({});
   const [isLoading, setIsLoading] = useState(false);
   const [hasVoted, setHasVoted] = useState(true); // Default to true to prevent flash of content
   const { toast } = useToast();
+  
+  const ELECTION_VOTED_KEY = `election-${electionId}-voted`;
 
   useEffect(() => {
     const votedStatus = localStorage.getItem(ELECTION_VOTED_KEY);
     setHasVoted(votedStatus === 'true');
-  }, []);
+  }, [ELECTION_VOTED_KEY]);
 
   const handleValueChange = (officeId: string, candidateId: string) => {
     setBallot((prev) => ({ ...prev, [officeId]: candidateId }));
@@ -48,7 +49,7 @@ export default function BallotForm({ offices, candidates }: BallotFormProps) {
     // In a real app, voterId would come from an auth system
     const voterId = `voter-${Math.random().toString(36).substring(7)}`; 
 
-    const result = await submitVote(voterId, ballot);
+    const result = await submitVote(electionId, voterId, ballot);
 
     if (result.success) {
       localStorage.setItem(ELECTION_VOTED_KEY, 'true');

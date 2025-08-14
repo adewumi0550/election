@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, LogOut, FileText, Settings, Users } from 'lucide-react';
+import { LayoutDashboard, LogOut, FileText, Settings, Users, Vote } from 'lucide-react';
 
 import {
   SidebarProvider,
@@ -25,6 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const menuItems = [
       { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/admin/elections', label: 'Elections', icon: Vote },
       { href: '/admin/candidates', label: 'Candidates', icon: Users },
       { href: '/admin/manifesto-writer', label: 'Manifesto Writer', icon: FileText },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
@@ -42,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <SidebarMenuItem key={item.href}>
                   <Link href={item.href}>
                     <SidebarMenuButton
-                      isActive={pathname === item.href}
+                      isActive={pathname.startsWith(item.href) && (item.href !== '/admin' || pathname === '/admin')}
                       tooltip={item.label}
                     >
                       <item.icon />
