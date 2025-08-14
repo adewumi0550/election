@@ -38,7 +38,7 @@ export async function getOfficesClient(): Promise<Office[]> {
 
 
 // ADMIN API
-export async function createAdminUser(name: string, email: string, pass: string) {
+export async function createAdminUser(name: string, email: string, pass: string): Promise<{ success: boolean; message: string; }> {
     try {
         const userRecord = await serverAuth.createUser({
             email,
