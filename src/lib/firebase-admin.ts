@@ -9,7 +9,7 @@ config();
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
   throw new Error(
     'Firebase Admin initialization failed. The environment variable FIREBASE_SERVICE_ACCOUNT_BASE64 is missing. ' +
-    "Please encode your entire service account JSON file to base64 and set it as this variable in your .env file."
+    "Please encode your entire service account JSON file to base64 and set it as this variable in your project's .env file."
   );
 }
 
@@ -22,6 +22,10 @@ if (!admin.apps.length) {
     ).toString('utf8');
     
     const serviceAccount = JSON.parse(serviceAccountJson);
+
+    // **CRITICAL FIX**: The private key in the JSON string contains literal "\\n" characters.
+    // These must be replaced with actual newline characters for the SDK to parse the PEM key correctly.
+    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
