@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import ElectionForm from '../election-form';
-import { createElection } from '@/lib/data';
+import { createElection } from '@/lib/actions';
 
 export default function NewElectionPage() {
     return (

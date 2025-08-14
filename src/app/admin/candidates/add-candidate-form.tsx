@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { addCandidate } from '@/lib/data';
+import { addCandidate } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -84,6 +84,7 @@ export default function AddCandidateForm({ offices, elections, selectedElectionI
       });
       toast({ title: 'Success', description: 'Candidate added successfully.' });
       router.refresh();
+      // A full page reload might be better here to ensure all state is reset.
       window.location.href = `/admin/candidates?electionId=${data.electionId}`;
     } catch (error) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to add candidate.' });

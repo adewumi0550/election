@@ -6,7 +6,7 @@ import CandidateCard from './candidate-card';
 import { RadioGroup } from './ui/radio-group';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { submitVote } from '@/lib/data';
+import { submitVote } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import {
@@ -60,7 +60,7 @@ export default function BallotForm({ offices, candidates, electionId }: BallotFo
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    const result = await submitVote(electionId, matric, ballot);
+    const result = await submitVote({electionId, voterId: matric, ballot});
 
     if (result.success) {
       localStorage.setItem(ELECTION_VOTED_KEY, 'true');

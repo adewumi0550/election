@@ -1,4 +1,5 @@
-import { getCandidates, getOffices, deleteCandidate } from '@/lib/data';
+import { getCandidates, getOffices } from '@/lib/queries';
+import { deleteCandidate } from '@/lib/actions';
 import Image from 'next/image';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';

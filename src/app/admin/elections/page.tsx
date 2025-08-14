@@ -1,15 +1,16 @@
-import { getElections } from '@/lib/data';
+import { getElections } from '@/lib/queries';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
+import type { Election } from '@/lib/types';
 
 export default async function ElectionsPage() {
     const elections = await getElections();
 
-    const getStatus = (startTime: Date, endTime: Date) => {
+    const getStatus = (startTime: Date, endTime: Date): JSX.Element => {
         const now = new Date();
         if (now < startTime) return <Badge variant="secondary">Upcoming</Badge>;
         if (now > endTime) return <Badge variant="outline">Ended</Badge>;
@@ -47,7 +48,7 @@ export default async function ElectionsPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {elections.map(election => (
+                            {elections.map((election: Election) => (
                                 <TableRow key={election.id}>
                                     <TableCell>{election.title}</TableCell>
                                     <TableCell>{new Date(election.startTime).toLocaleString()}</TableCell>

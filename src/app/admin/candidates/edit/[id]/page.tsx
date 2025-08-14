@@ -1,4 +1,5 @@
-import { getCandidate, getOffices, updateCandidate } from '@/lib/data';
+import { getCandidate, getOffices } from '@/lib/queries';
+import { updateCandidate } from '@/lib/actions';
 import { notFound, redirect } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

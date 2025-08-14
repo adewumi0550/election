@@ -13,10 +13,11 @@ import {
   signOut as firebaseSignOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  updateProfile,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { createAdminUser, getAdminUser } from '@/lib/data';
+import { doc, getDoc, setDoc, collection } from "firebase/firestore"; 
+import { auth, db } from '@/lib/firebase';
 import type { Admin } from '@/lib/types';
 
 interface AuthContextType {
@@ -30,6 +31,15 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+async function getAdminUser(uid: string): Promise<Admin | null> {
+    const docRef = doc(db, 'admins', uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return docSnap.data() as Admin;
+    }
+    return null;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -46,8 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
            setAdmin(adminData);
         } else {
            setAdmin(null);
-           // Optional: sign out user if not a verified admin
-           // firebaseSignOut(auth); 
         }
       } else {
         setUser(null);
@@ -62,19 +70,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (email: string, pass: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, pass);
-      // onAuthStateChanged will handle the rest
       return { success: true, message: "Signed in successfully" };
     } catch (error: any) {
-      return { success: false, message: error.message };
+      return { success: false, message: error.message || 'An unknown error occurred.' };
     }
   };
 
   const signUp = async (email: string, pass: string, name: string) => {
     try {
-        const result = await createAdminUser(name, email, pass);
-        return result;
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        await updateProfile(userCredential.user, { displayName: name });
+        
+        const newAdmin: Admin = {
+            uid: userCredential.user.uid,
+            name: name,
+            email: email,
+            status: true,
+            verified: true, // Auto-verified on creation for simplicity
+            restricted: false,
+        };
+
+        await setDoc(doc(db, 'admins', userCredential.user.uid), newAdmin);
+        
+        return { success: true, message: 'Account created successfully! You can now log in.' };
     } catch (error: any) {
-        return { success: false, message: error.message };
+        let message = 'An unexpected error occurred.';
+        if (error.code === 'auth/email-already-in-use') {
+            message = 'This email is already registered.';
+        } else if (error.message) {
+            message = error.message;
+        }
+        return { success: false, message };
     }
   };
 
@@ -87,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await sendPasswordResetEmail(auth, email);
       return { success: true, message: 'Password reset email sent.' };
     } catch (error: any) {
-      return { success: false, message: error.message };
+      return { success: false, message: error.message || 'An unknown error occurred.' };
     }
   }
 

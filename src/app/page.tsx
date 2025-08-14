@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getCandidates, getElectionsClient, getOfficesClient } from '@/lib/data';
+import { getCandidates, getElectionsClient, getOfficesClient } from '@/lib/queries';
 import type { Candidate, Election, Office } from '@/lib/types';
 import CountdownTimer from '@/components/countdown-timer';
 import BallotForm from '@/components/ballot-form';

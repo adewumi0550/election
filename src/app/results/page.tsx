@@ -1,7 +1,8 @@
-import { getElection, getElections, getElectionResults } from '@/lib/data';
+import { getElection, getElections, getElectionResults } from '@/lib/queries';
 import ResultsChart from '@/components/results-chart';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Suspense } from 'react';
+import type { Election } from '@/lib/types';
 
 export default async function ResultsPage({ searchParams }: { searchParams: { electionId?: string }}) {
     const elections = await getElections();

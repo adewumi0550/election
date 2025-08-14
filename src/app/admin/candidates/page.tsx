@@ -1,6 +1,5 @@
-import { getCandidates, getOffices, getElections } from '@/lib/data';
+import { getElections, getOffices } from '@/lib/queries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { revalidatePath } from 'next/cache';
 import { Suspense } from 'react';
 import CandidateList from './candidate-list';
 import AddCandidateForm from './add-candidate-form';

@@ -1,4 +1,5 @@
-import { getElection, updateElection, getVoters, addVoter, deleteVoter } from '@/lib/data';
+import { getElection, getVoters } from '@/lib/queries';
+import { updateElection, addVoter, deleteVoter } from '@/lib/actions';
 import { notFound, redirect } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import ElectionForm from '../../election-form';

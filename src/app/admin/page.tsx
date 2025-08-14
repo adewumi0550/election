@@ -1,12 +1,13 @@
-import { getCandidates, getElections, getElectionResults } from '@/lib/data';
+import { getCandidates, getElections, getElectionResults } from '@/lib/queries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Vote, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import type { Election } from '@/lib/types';
 
 export default async function AdminDashboardPage() {
     const elections = await getElections();
-    const activeElection = elections.find(e => new Date(e.startTime) <= new Date() && new Date(e.endTime) >= new Date()) || elections[0];
+    const activeElection: Election | undefined = elections.find(e => new Date(e.startTime) <= new Date() && new Date(e.endTime) >= new Date()) || elections[0];
 
     const candidates = activeElection ? await getCandidates(activeElection.id) : [];
     const results = activeElection ? await getElectionResults(activeElection.id) : [];
@@ -17,8 +18,10 @@ export default async function AdminDashboardPage() {
     const getElectionStatus = (election: any) => {
         if (!election) return 'N/A';
         const now = new Date();
-        if (now < new Date(election.startTime)) return 'Upcoming';
-        if (now > new Date(election.endTime)) return 'Ended';
+        const startTime = new Date(election.startTime);
+        const endTime = new Date(election.endTime);
+        if (now < startTime) return 'Upcoming';
+        if (now > endTime) return 'Ended';
         return 'In Progress';
     }
 

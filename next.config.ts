@@ -23,8 +23,9 @@ const nextConfig: NextConfig = {
     ],
   },
   webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals.push('firebase-admin');
+    // Exclude firebase-admin from client-side bundles
+    if (!isServer) {
+        config.externals.push('firebase-admin');
     }
     return config;
   },
