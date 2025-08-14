@@ -52,7 +52,7 @@ export async function createAdminUser(name: string, email: string, pass: string)
             name: name,
             email: email,
             status: true,
-            verified: true,
+            verified: true, // Auto-verified on creation
             restricted: false,
         });
 
