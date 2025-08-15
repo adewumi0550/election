@@ -5,13 +5,16 @@ import { PlusCircle, Upload, Trash2, ArrowLeft, Download } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function ManageVotersPage({ params }: { params: { id: string } }) {
   const voters = [
-    { id: "v1", matricNo: "12345", name: "Alice Smith", voted: true },
-    { id: "v2", matricNo: "67890", name: "Bob Johnson", voted: false },
-    { id: "v3", matricNo: "54321", name: "Charlie Brown", voted: true },
+    { id: "v1", matricNo: "12345", name: "Alice Smith", level: 100, voted: true },
+    { id: "v2", matricNo: "67890", name: "Bob Johnson", level: 200, voted: false },
+    { id: "v3", matricNo: "54321", name: "Charlie Brown", level: 100, voted: true },
   ];
+
+  const levels = [100, 200, 300, 400, 500, 600, 700, 800];
 
   return (
     <div className="container mx-auto px-4 py-12 md:px-6">
@@ -35,6 +38,7 @@ export default function ManageVotersPage({ params }: { params: { id: string } })
                   <TableRow>
                     <TableHead>Matric No.</TableHead>
                     <TableHead>Name</TableHead>
+                    <TableHead>Level</TableHead>
                     <TableHead>Voted</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -44,6 +48,7 @@ export default function ManageVotersPage({ params }: { params: { id: string } })
                     <TableRow key={voter.id}>
                       <TableCell className="font-medium">{voter.matricNo}</TableCell>
                       <TableCell>{voter.name}</TableCell>
+                      <TableCell>{voter.level}</TableCell>
                       <TableCell>{voter.voted ? "Yes" : "No"}</TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="icon" className="text-red-500"><Trash2 className="h-4 w-4" /></Button>
@@ -70,6 +75,21 @@ export default function ManageVotersPage({ params }: { params: { id: string } })
                 <Label htmlFor="voter-name">Full Name</Label>
                 <Input id="voter-name" placeholder="e.g., Alice Smith" />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="level">Level</Label>
+                <Select>
+                  <SelectTrigger id="level">
+                    <SelectValue placeholder="Select a level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {levels.map((level) => (
+                      <SelectItem key={level} value={String(level)}>
+                        {level} Level
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <Button className="w-full">
                 <PlusCircle className="mr-2 h-4 w-4" /> Add Voter
               </Button>
@@ -83,7 +103,7 @@ export default function ManageVotersPage({ params }: { params: { id: string } })
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between text-sm">
-                <p className="text-muted-foreground">Format: matric_no, full_name</p>
+                <p className="text-muted-foreground">Format: matric_no, full_name, level</p>
                 <Button variant="link" size="sm" className="p-0 h-auto">
                     <Download className="mr-1 h-3 w-3" />
                     Download Template

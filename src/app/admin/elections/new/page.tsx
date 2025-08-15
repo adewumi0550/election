@@ -2,10 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function CreateElectionPage() {
+  const levels = [100, 200, 300, 400, 500, 600, 700, 800];
+
   return (
     <div className="container mx-auto px-4 py-12 md:px-6">
         <div className="mb-8">
@@ -36,6 +39,18 @@ export default function CreateElectionPage() {
                 <div className="space-y-2">
                   <Label htmlFor="end-date">End Date & Time</Label>
                   <Input id="end-date" type="datetime-local" required />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Label>Supported Levels</Label>
+                <p className="text-sm text-muted-foreground">Select which academic levels are eligible for this election.</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                  {levels.map((level) => (
+                    <div key={level} className="flex items-center space-x-2">
+                      <Checkbox id={`level-${level}`} />
+                      <Label htmlFor={`level-${level}`} className="font-normal">{level} Level</Label>
+                    </div>
+                  ))}
                 </div>
               </div>
               <Button className="w-full" size="lg">Create Election</Button>
