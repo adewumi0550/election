@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminDashboard() {
   const candidates = [
@@ -17,9 +18,14 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-gray-500">Manage candidates and monitor election progress.</p>
         </div>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add Candidate
-        </Button>
+        <div className="flex gap-2">
+          <Link href="/admin/manifesto-writer">
+            <Button variant="outline">Manifesto Writer</Button>
+          </Link>
+          <Button>
+            <PlusCircle className="mr-2 h-4 w-4" /> Add Candidate
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6">

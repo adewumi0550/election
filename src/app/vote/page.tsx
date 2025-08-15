@@ -41,9 +41,9 @@ export default function VotePage() {
             <CardContent>
               <RadioGroup>
                 {office.candidates.map((candidate) => (
-                  <div key={candidate.id} className="flex items-center space-x-2">
+                  <div key={candidate.id} className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <RadioGroupItem value={candidate.id} id={candidate.id} />
-                    <Label htmlFor={candidate.id} className="text-lg">{candidate.name}</Label>
+                    <Label htmlFor={candidate.id} className="text-lg font-medium cursor-pointer flex-1">{candidate.name}</Label>
                   </div>
                 ))}
               </RadioGroup>
