@@ -1,14 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { PlusCircle, Users, Vote, Calendar, BarChart2 } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboard() {
-  const candidates = [
-    { name: "Ada Lovelace", office: "President", votes: 543210 },
-    { name: "Grace Hopper", office: "President", votes: 456789 },
-    { name: "Alan Turing", office: "Vice President", votes: 654321 },
+  const elections = [
+    { id: "1", title: "Presidential Election 2024", startDate: "2024-10-01", endDate: "2024-10-15", status: "Active" },
+    { id: "2", title: "Student Union Election", startDate: "2024-09-05", endDate: "2024-09-06", status: "Completed" },
+    { id: "3", title: "Board of Directors Vote", startDate: "2025-01-10", endDate: "2025-01-20", status: "Upcoming" },
   ];
 
   return (
@@ -16,66 +17,96 @@ export default function AdminDashboard() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-gray-500">Manage candidates and monitor election progress.</p>
+          <p className="text-gray-500">Manage elections, candidates, and voters.</p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/admin/manifesto-writer">
-            <Button variant="outline">Manifesto Writer</Button>
-          </Link>
+        <Link href="/admin/elections/new">
           <Button>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Candidate
+            <PlusCircle className="mr-2 h-4 w-4" /> Create Election
           </Button>
-        </div>
+        </Link>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card>
-          <CardHeader>
-            <CardTitle>Election Overview</CardTitle>
-            <CardDescription>Summary of the current election status.</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Elections</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="grid md:grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-100 rounded-lg dark:bg-gray-800">
-              <h3 className="text-sm font-medium text-gray-500">Total Votes</h3>
-              <p className="text-3xl font-bold">1,234,567</p>
-            </div>
-            <div className="p-4 bg-gray-100 rounded-lg dark:bg-gray-800">
-              <h3 className="text-sm font-medium text-gray-500">Candidates</h3>
-              <p className="text-3xl font-bold">6</p>
-            </div>
-            <div className="p-4 bg-gray-100 rounded-lg dark:bg-gray-800">
-              <h3 className="text-sm font-medium text-gray-500">Time Remaining</h3>
-              <p className="text-3xl font-bold">2d 10h</p>
-            </div>
+          <CardContent>
+            <div className="text-2xl font-bold">1</div>
+            <p className="text-xs text-muted-foreground">Currently open for voting</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Candidates</CardTitle>
-            <CardDescription>List of all registered candidates.</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Candidates</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Office</TableHead>
-                  <TableHead className="text-right">Votes</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {candidates.map((candidate) => (
-                  <TableRow key={candidate.name}>
-                    <TableCell className="font-medium">{candidate.name}</TableCell>
-                    <TableCell>{candidate.office}</TableCell>
-                    <TableCell className="text-right">{candidate.votes.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">Across all elections</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Voters</CardTitle>
+            <Vote className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">5,432</div>
+            <p className="text-xs text-muted-foreground">Registered to vote</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completed Elections</CardTitle>
+            <BarChart2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1</div>
+            <p className="text-xs text-muted-foreground">View archived results</p>
           </CardContent>
         </Card>
       </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Election Overview</CardTitle>
+          <CardDescription>List of all created elections and their status.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Election Title</TableHead>
+                <TableHead>Start Date</TableHead>
+                <TableHead>End Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {elections.map((election) => (
+                <TableRow key={election.id}>
+                  <TableCell className="font-medium">{election.title}</TableCell>
+                  <TableCell>{election.startDate}</TableCell>
+                  <TableCell>{election.endDate}</TableCell>
+                  <TableCell>
+                    <Badge variant={election.status === 'Active' ? 'default' : election.status === 'Completed' ? 'secondary' : 'outline'}>
+                        {election.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link href={`/admin/elections/${election.id}`}>
+                        <Button variant="outline" size="sm">Manage</Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
