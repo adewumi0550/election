@@ -7,8 +7,8 @@ import Footer from "@/components/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Election Platform",
-  description: "Vote for the future.",
+  title: "Campus Vote",
+  description: "Vote for the future of our campus.",
 };
 
 export default function RootLayout({
