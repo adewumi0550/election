@@ -6,10 +6,10 @@ export function AppLogo() {
       <Vote className="h-8 w-8 text-primary" />
       <div className="flex flex-col">
         <span className="font-bold text-lg group-data-[collapsible=icon]:hidden">
-          ADUST E-Voting
+          E-Voting
         </span>
         <span className="text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
-          Wudil
+          Platform
         </span>
       </div>
     </div>

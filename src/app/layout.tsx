@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from '@/components/ui/toaster';
 import { AppShell } from '@/components/app-shell';
 
 export const metadata: Metadata = {
-  title: 'ADUST Wudil E-Voting',
-  description: 'Online Voting System for ALIKO DANGOTE University of Science and Technology, Wudil',
+  title: 'E-Voting Platform',
+  description: 'A modern platform for digital voting.',
 };
 
 export default function RootLayout({
@@ -24,7 +23,6 @@ export default function RootLayout({
         <AppShell>
           {children}
         </AppShell>
-        <Toaster />
       </body>
     </html>
   );

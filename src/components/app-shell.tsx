@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart2, Home } from 'lucide-react';
+import { BarChart2, Home, LayoutDashboard } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -12,23 +12,18 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarFooter,
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/app-logo';
 
-function AppShellContent({ children }: { children: React.ReactNode }) {
+export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdminPage = pathname.startsWith('/admin');
-
-  if (isAdminPage) {
-    return children;
-  }
 
   const menuItems = [
     { href: '/', label: 'Vote', icon: Home },
     { href: '/results', label: 'Results', icon: BarChart2 },
+    { href: '/admin', label: 'Admin', icon: LayoutDashboard },
   ];
 
   return (
@@ -54,8 +49,6 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             ))}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter>
-        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:h-auto md:border-none md:bg-transparent md:px-6">
@@ -67,10 +60,4 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       </SidebarInset>
     </SidebarProvider>
   );
-}
-
-export function AppShell({ children }: { children: React.ReactNode }) {
-    return (
-        <AppShellContent>{children}</AppShellContent>
-    )
 }
