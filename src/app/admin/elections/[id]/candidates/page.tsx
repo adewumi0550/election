@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function ManageCandidatesPage({ params }: { params: { id: string } }) {
   const candidates = [
@@ -13,6 +14,14 @@ export default function ManageCandidatesPage({ params }: { params: { id: string 
     { id: "c2", name: "Grace Hopper", office: "President", manifesto: "Innovation in computing education." },
     { id: "c3", name: "Alan Turing", office: "Vice President", manifesto: "Advocate for AI ethics and research." },
   ];
+
+  const offices = [
+    { id: "pres", name: "President" },
+    { id: "vp", name: "Vice President" },
+    { id: "sec", name: "Secretary" },
+    { id: "treas", name: "Treasurer" },
+    { id: "pro", name: "Public Relations Officer" },
+  ]
 
   return (
     <div className="container mx-auto px-4 py-12 md:px-6">
@@ -69,7 +78,18 @@ export default function ManageCandidatesPage({ params }: { params: { id: string 
               </div>
               <div className="space-y-2">
                 <Label htmlFor="office">Office</Label>
-                <Input id="office" placeholder="e.g., President" />
+                <Select>
+                  <SelectTrigger id="office">
+                    <SelectValue placeholder="Select an office" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {offices.map((office) => (
+                      <SelectItem key={office.id} value={office.name}>
+                        {office.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="manifesto">Manifesto</Label>
