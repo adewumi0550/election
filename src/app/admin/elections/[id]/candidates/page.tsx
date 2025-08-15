@@ -16,12 +16,23 @@ export default function ManageCandidatesPage({ params }: { params: { id: string 
   ];
 
   const offices = [
-    { id: "pres", name: "President" },
-    { id: "vp", name: "Vice President" },
-    { id: "sec", name: "Secretary" },
-    { id: "treas", name: "Treasurer" },
-    { id: "pro", name: "Public Relations Officer" },
-  ]
+    { id: "pres", name: "The President" },
+    { id: "vp", name: "The Vice President" },
+    { id: "sec-gen", name: "The Secretary General" },
+    { id: "asst-sec-gen", name: "The Assistant Secretary General" },
+    { id: "fin-sec", name: "The Financial secretary" },
+    { id: "treas", name: "The Treasurer" },
+    { id: "wel-1", name: "The Welfare Officer I" },
+    { id: "wel-2", name: "The Welfare Officer II" },
+    { id: "acad", name: "Academic Director" },
+    { id: "social", name: "The Social Director" },
+    { id: "sales", name: "The Sale Director" },
+    { id: "sports", name: "The Sport Director" },
+    { id: "pro", name: "The Public Relation Officer" },
+    { id: "health-1", name: "The Health Director 1" },
+    { id: "health-2", name: "The Health Officer II" },
+    { id: "food", name: "The Food Directors" },
+  ];
 
   return (
     <div className="container mx-auto px-4 py-12 md:px-6">
